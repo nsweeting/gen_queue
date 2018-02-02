@@ -41,7 +41,7 @@ defmodule GenQueue do
       def push!(%GenQueue.Job{} = job) do
         case push(job) do
           {:ok, job} -> job
-          _ -> raise GenQueue.Error, "Enqueuer failed to push job."
+          _ -> raise GenQueue.Error, "Failed to push job."
         end
       end
 
@@ -60,7 +60,7 @@ defmodule GenQueue do
       def pop!(opts \\ []) do
         case pop(opts) do
           {:ok, job} -> job
-          _ -> raise GenQueue.Error, "Enqueuer failed to pop job."
+          _ -> raise GenQueue.Error, "Failed to pop job."
         end
       end
 
