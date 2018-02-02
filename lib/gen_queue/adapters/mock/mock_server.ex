@@ -22,7 +22,7 @@ defmodule GenQueue.MockServer do
   end
 
   def handle_call({:flush, _opts}, _from, _queues) do
-    {:reply, :ok, []}
+    {:reply, :ok, %{}}
   end
 
   def handle_call({:pop, opts}, _from, queues) do
