@@ -1,9 +1,9 @@
 defmodule GenQueue.Adapter do
-  @callback handle_push(module, GenQueue.Job.t) :: {:ok, GenQueue.Job.t} | {:error, any}
+  @callback handle_push(module, GenQueue.Job.t()) :: {:ok, GenQueue.Job.t()} | {:error, any}
 
-  @callback handle_flush(module, list) :: {:ok, integer} | {:error, any}
+  @callback handle_pop(module, binary) :: {:ok, GenQueue.Job.t()} | {:ok, nil} | {:error, any}
 
-  @callback handle_pop(module, list) :: {:ok, GenQueue.Job.t} | {:ok, :nil} | {:error, any}
+  @callback handle_flush(module, binary) :: {:ok, integer} | {:error, any}
 
   defmacro __using__(_) do
     quote location: :keep do
@@ -13,15 +13,11 @@ defmodule GenQueue.Adapter do
         {:error, :not_implemented}
       end
 
-      def handle_flush(_caller, _opts \\ [])
-
-      def handle_flush(_caller, _opts) do
+      def handle_pop(_caller, _queue) do
         {:error, :not_implemented}
       end
 
-      def handle_pop(_caller, _opts \\ [])
-      
-      def handle_pop(_caller, _opts) do
+      def handle_flush(_caller, _queue) do
         {:error, :not_implemented}
       end
 
