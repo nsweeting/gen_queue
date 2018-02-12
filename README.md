@@ -10,7 +10,7 @@ by adding `gen_queue` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:gen_queue, "~> 0.1.0"}
+    {:gen_queue, "~> 0.1.1"}
   ]
 end
 ```

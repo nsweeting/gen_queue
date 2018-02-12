@@ -1,4 +1,4 @@
-defmodule GenQueue.Adapters.MockServer do
+defmodule GenQueue.Adapters.SimpleServer do
   use GenServer
 
   def start_link(caller, _opts) do
@@ -9,16 +9,14 @@ defmodule GenQueue.Adapters.MockServer do
     {:ok, state}
   end
 
-  def handle_call({:push, job}, _from, queues) do
-    queue_name = GenQueue.Job.get_opt(job, :queue)
-
+  def handle_call({:push, queue_name, item}, _from, queues) do
     {_, queues} =
       Map.get_and_update(queues, queue_name, fn
-        nil -> {nil, :queue.in(job, :queue.new())}
-        queue -> {nil, :queue.in(job, queue)}
+        nil -> {nil, :queue.in(item, :queue.new())}
+        queue -> {nil, :queue.in(item, queue)}
       end)
 
-    {:reply, {:ok, job}, queues}
+    {:reply, {:ok, item}, queues}
   end
 
   def handle_call({:flush, queue_name}, _from, queues) do
@@ -33,18 +31,18 @@ defmodule GenQueue.Adapters.MockServer do
   end
 
   def handle_call({:pop, queue_name}, _from, queues) do
-    {job, queues} =
+    {item, queues} =
       Map.get_and_update(queues, queue_name, fn
         nil ->
           {nil, :queue.new()}
 
         queue ->
           case :queue.out(queue) do
-            {{:value, job}, new_queue} -> {job, new_queue}
+            {{:value, item}, new_queue} -> {item, new_queue}
             {:empty, new_queue} -> {nil, new_queue}
           end
       end)
 
-    {:reply, {:ok, job}, queues}
+    {:reply, {:ok, item}, queues}
   end
 end

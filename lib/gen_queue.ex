@@ -1,16 +1,22 @@
 defmodule GenQueue do
+  @moduledoc """
+  A behaviour module for implementing queue wrappers.
+  
+  GenQueue relies on adapters to handle the specifics of how j
+
+  """
   @callback start_link(opts :: Keyword.t()) ::
               {:ok, pid}
               | {:error, {:already_started, pid}}
               | {:error, term}
 
-  @callback push(atom, list, map) :: {:ok, GenQueue.Job.t()} | {:error, any}
+  @callback push(binary, any) :: {:ok, any} | {:error, any}
 
-  @callback push!(atom, list, list) :: GenQueue.Job.t() | no_return
+  @callback push!(binary, any) :: any | no_return
 
-  @callback pop(binary) :: {:ok, GenQueue.Job.t()} | {:ok, nil} | {:error, any}
+  @callback pop(binary) :: {:ok, any} | {:error, any}
 
-  @callback pop!(binary) :: GenQueue.Job.t() | no_return
+  @callback pop!(binary) :: any | no_return
 
   @callback flush(binary) :: {:ok, integer} | {:error, any}
 
@@ -26,37 +32,37 @@ defmodule GenQueue do
       @adapter GenQueue.Config.adapter(@otp_app, __MODULE__)
 
       def start_link(opts \\ []) do
-        apply(@adapter, :start_link, [__MODULE__, opts])
+        apply(__adapter__, :start_link, [__MODULE__, opts])
       end
 
-      def push(module, args \\ [], opts \\ %{}) do
-        GenQueue.push(__MODULE__, module, args, opts)
+      def push(queue_name, item) do
+        GenQueue.push(__MODULE__, queue_name, item)
       end
 
-      def push!(module, args \\ [], opts \\ %{}) do
-        case push(module, args, opts) do
-          {:ok, job} -> job
+      def push!(queue_name, item) do
+        case push(queue_name, item) do
+          {:ok, item} -> item
           _ -> raise GenQueue.Error, "Failed to push job."
         end
       end
 
-      def pop(queue) do
-        GenQueue.pop(__MODULE__, queue)
+      def pop(queue_name) do
+        GenQueue.pop(__MODULE__, queue_name)
       end
 
-      def pop!(queue) do
-        case pop(queue) do
+      def pop!(queue_name) do
+        case pop(queue_name) do
           {:ok, job} -> job
           _ -> raise GenQueue.Error, "Failed to pop job."
         end
       end
 
-      def flush(queue) do
-        GenQueue.flush(__MODULE__, queue)
+      def flush(queue_name) do
+        GenQueue.flush(__MODULE__, queue_name)
       end
 
-      def flush!(queue) do
-        case flush(queue) do
+      def flush!(queue_name) do
+        case flush(queue_name) do
           {:ok, count} -> count
           _ -> raise GenQueue.Error, "Failed to flush jobs."
         end
@@ -68,19 +74,18 @@ defmodule GenQueue do
     end
   end
 
-  @spec push(atom, atom, list, map) :: {:ok, GenQueue.Job.t()} | {:error, any}
-  def push(enqueuer, module, args \\ [], opts \\ %{}) do
-    job = GenQueue.Job.new(module, args, opts)
-    apply(enqueuer.__adapter__, :handle_push, [enqueuer, job])
+  @spec push(atom, binary, any) :: {:ok, any} | {:error, any}
+  def push(enqueuer, queue_name, item) do
+    apply(enqueuer.__adapter__, :handle_push, [enqueuer, queue_name, item])
   end
 
-  @spec pop(atom, binary) :: {:ok, GenQueue.Job.t()} | {:ok, nil} | {:error, any}
-  def pop(enqueuer, queue) do
-    apply(enqueuer.__adapter__, :handle_pop, [enqueuer, queue])
+  @spec pop(atom, binary) :: {:ok, any} | {:error, any}
+  def pop(enqueuer, queue_name) do
+    apply(enqueuer.__adapter__, :handle_pop, [enqueuer, queue_name])
   end
 
   @spec flush(atom, binary) :: {:ok, integer} | {:error, any}
-  def flush(enqueuer, queue) do
-    apply(enqueuer.__adapter__, :handle_flush, [enqueuer, queue])
+  def flush(enqueuer, queue_name) do
+    apply(enqueuer.__adapter__, :handle_flush, [enqueuer, queue_name])
   end
 end
