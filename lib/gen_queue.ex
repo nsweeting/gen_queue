@@ -1,8 +1,42 @@
 defmodule GenQueue do
   @moduledoc """
-  A behaviour module for implementing queue wrappers.
+  A behaviour module for implementing wrappers for queues.
   
-  GenQueue relies on adapters to handle the specifics of how j
+  GenQueue relies on adapters to handle the specifics of how the queues
+  are run. At its most simple, this can mean simple FIFO queues. At its
+  most advanced, this can mean full async job queues with retries and
+  backoffs. By providing a standard interface for such tools - ease in
+  switching between different implementations is assured.
+  
+  ## Example
+  
+  The GenQueue behaviour abstracts the common queue interactions. 
+  Developers are only required to implement the callbacks and functionality
+  they are interested in via adapters.
+  
+  Let's start with a simple FIFO queue:
+
+      defmodule Enqueuer do
+        use GenQueue
+      end
+      
+       # Start the queue
+      Enqueuer.start_link()
+  
+      # Push items into the :foo queue
+      Enqueuer.push(:foo, :hello)
+      #=> {:ok, :hello}
+      Enqueuer.push(:foo, :world)
+      #=> {:ok, :world}
+      
+      # Pop items from the :foo queue
+      Enqueuer.pop(:foo)
+      #=> {:ok, :hello}
+      Enqueuer.pop(:foo)
+      #=> {:ok, :world}
+  
+  We start our queue by calling `start_link\1`. This call is then
+  forwarded to our queue adapter. 
 
   """
   @callback start_link(opts :: Keyword.t()) ::
