@@ -67,7 +67,7 @@ defmodule GenQueue.Adapters.JobMockTest do
   end
 end
 
-Application.put_env(:gen_queue, Test, adapter: GenQueue.Adapters.JobMock)
+Application.put_env(:gen_queue, GenQueue.JobMockTest, adapter: GenQueue.Adapters.JobMock)
 
 defmodule GenQueue.JobMockTest do
   use GenQueue, otp_app: :gen_queue

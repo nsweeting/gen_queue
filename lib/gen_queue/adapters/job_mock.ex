@@ -1,27 +1,25 @@
 defmodule GenQueue.Adapters.JobMock do
   use GenQueue.Adapter
 
-  def start_link(caller, opts) do
-    GenQueue.Adapters.SimpleServer.start_link(caller, opts)
+  defguard is_job(job)
+    when is_tuple(job)
+    and tuple_size(job) == 3
+    and job |> elem(0) |> is_atom()
+    and job |> elem(1) |> is_list()
+    and job |> elem(2) |> is_map()
+
+  defdelegate start_link(gen_queue, opts), to: GenQueue.Adapters.Simple
+  defdelegate handle_pop(gen_queue, queue), to: GenQueue.Adapters.Simple
+  defdelegate handle_flush(gen_queue, opts), to: GenQueue.Adapters.Simple
+  defdelegate handle_length(gen_queue, opts), to: GenQueue.Adapters.Simple
+
+  def handle_push(caller, queue, job) do
+    GenServer.call(caller, {:push, queue, build_job(job)})
   end
 
-  def handle_push(caller, queue, {module}) do
-    GenServer.call(caller, {:push, queue, {module, [], %{}}})
-  end
+  defp build_job(job) when is_job(job), do: job
 
-  def handle_push(caller, queue, {module, args}) do
-    GenServer.call(caller, {:push, queue, {module, args, %{}}})
-  end
+  defp build_job({module}), do: {module, [], %{}} |> build_job()
 
-  def handle_push(caller, queue, {module, args, opts}) do
-    GenServer.call(caller, {:push, queue, {module, args, opts}})
-  end
-
-  def handle_pop(caller, queue) do
-    GenServer.call(caller, {:pop, queue})
-  end
-
-  def handle_flush(caller, queue) do
-    GenServer.call(caller, {:flush, queue})
-  end
+  defp build_job({module, args}), do: {module, args, %{}} |> build_job()
 end
