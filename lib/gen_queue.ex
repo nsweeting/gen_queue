@@ -1,6 +1,6 @@
 defmodule GenQueue do
   @moduledoc """
-  A behaviour module for implementing wrappers for queues.
+  A behaviour module for implementing queues.
   
   GenQueue relies on adapters to handle the specifics of how the queues
   are run. At its most simple, this can mean simple FIFO queues. At its
