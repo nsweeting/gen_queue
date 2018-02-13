@@ -35,8 +35,17 @@ defmodule GenQueue do
       Enqueuer.pop(:foo)
       #=> {:ok, :world}
   
-  We start our queue by calling `start_link\1`. This call is then
-  forwarded to our queue adapter. 
+  We start our enqueuer by calling `start_link\1`. This call is then
+  forwarded to our adapter. In this case, we dont specify an adapter
+  anywhere, so it defaults to the simple FIFO queue implemented with
+  the included `GenQueue.Adapter.Simple`.
+  
+  We can then add items into our simple FIFO queues with `push/2`, as
+  well as remove them with `pop/1`.
+  
+  ## use GenQueue and adapters
+  
+  Implementing a simple queue is easy. 
 
   """
   @callback start_link(opts :: Keyword.t()) ::
