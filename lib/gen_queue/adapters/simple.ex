@@ -67,7 +67,7 @@ defmodule GenQueue.Adapters.Simple do
   def handle_flush(gen_queue, queue) do
     GenServer.call(gen_queue, {:flush, queue})
   end
-  
+
   def handle_length(gen_queue, queue) do
     GenServer.call(gen_queue, {:length, queue})
   end
