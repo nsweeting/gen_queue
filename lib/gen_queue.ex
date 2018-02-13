@@ -19,8 +19,8 @@ defmodule GenQueue do
   @callback pop!(queue) :: any | no_return
 
   @callback flush(queue) :: {:ok, integer} | {:error, any}
-
-  @callback flush!(queue) :: integer | no_return
+  
+  @callback size(queue) :: {:ok, integer} | {:error, any}
 
   @callback __adapter__ :: atom
   
@@ -64,11 +64,8 @@ defmodule GenQueue do
         GenQueue.flush(__MODULE__, queue)
       end
 
-      def flush!(queue) do
-        case flush(queue) do
-          {:ok, count} -> count
-          _ -> raise GenQueue.Error, "Failed to flush jobs."
-        end
+      def size(queue) do
+        GenQueue.size(__MODULE__, queue)
       end
 
       def __adapter__ do
@@ -90,6 +87,11 @@ defmodule GenQueue do
   @spec flush(GenQueue.t(), queue) :: {:ok, integer} | {:error, any}
   def flush(gen_queue, queue) do
     apply(gen_queue.__adapter__, :handle_flush, [gen_queue, queue])
+  end
+  
+  @spec size(GenQueue.t(), queue) :: {:ok, integer} | {:error, any}
+  def size(gen_queue, queue) do
+    apply(gen_queue.__adapter__, :handle_size, [gen_queue, queue])
   end
   
   @spec config_adapter(GenQueue.t(), list) :: module
