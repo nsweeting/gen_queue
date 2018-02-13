@@ -7,6 +7,8 @@ defmodule GenQueue.Adapter do
   
   @callback handle_size(GenQueue.t(), GenQueue.queue()) :: {:ok, integer} | {:error, any}
 
+  @type t :: module
+
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour GenQueue.Adapter

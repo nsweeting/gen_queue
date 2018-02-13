@@ -1,4 +1,4 @@
-defmodule GenQueue.Adapters.JobMockTest do
+defmodule GenQueue.SimpleAdapterTest do
   use ExUnit.Case
 
   alias GenQueue.SimpleTest
