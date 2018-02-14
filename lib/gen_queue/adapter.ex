@@ -1,11 +1,11 @@
 defmodule GenQueue.Adapter do
-  @callback handle_push(GenQueue.t(), GenQueue.queue(), any) :: {:ok, any} | {:error, any}
+  @callback handle_push(GenQueue.t(), any, list) :: {:ok, any} | {:error, any}
 
-  @callback handle_pop(GenQueue.t(), GenQueue.queue()) :: {:ok, any} | {:error, any}
+  @callback handle_pop(GenQueue.t(), list) :: {:ok, any} | {:error, any}
 
-  @callback handle_flush(GenQueue.t(), GenQueue.queue()) :: {:ok, integer} | {:error, any}
+  @callback handle_flush(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
   
-  @callback handle_size(GenQueue.t(), GenQueue.queue()) :: {:ok, integer} | {:error, any}
+  @callback handle_size(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
 
   @type t :: module
 
@@ -13,19 +13,19 @@ defmodule GenQueue.Adapter do
     quote location: :keep do
       @behaviour GenQueue.Adapter
 
-      def handle_push(_gen_queue, _queue, _item) do
+      def handle_push(_gen_queue, _item, _opts) do
         {:error, :not_implemented}
       end
 
-      def handle_pop(_gen_queue, _queue) do
+      def handle_pop(_gen_queue, _opts) do
         {:error, :not_implemented}
       end
 
-      def handle_flush(_gen_queue, _queue) do
+      def handle_flush(_gen_queue, _opts) do
         {:error, :not_implemented}
       end
 
-      def handle_size(_gen_queue, _queue) do
+      def handle_size(_gen_queue, _opts) do
         {:error, :not_implemented}
       end
 

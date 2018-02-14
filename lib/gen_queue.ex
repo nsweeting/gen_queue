@@ -16,26 +16,26 @@ defmodule GenQueue do
 
   Let's start with a simple FIFO queue:
 
-      defmodule Enqueuer do
+      defmodule Queue do
         use GenQueue
       end
       
        # Start the queue
-      Enqueuer.start_link()
+      Queue.start_link()
 
       # Push items into the :foo queue
-      Enqueuer.push(:foo, :hello)
+      Queue.push(:hello)
       #=> {:ok, :hello}
-      Enqueuer.push(:foo, :world)
+      Queue.push(:world)
       #=> {:ok, :world}
       
       # Pop items from the :foo queue
-      Enqueuer.pop(:foo)
+      Queue.pop()
       #=> {:ok, :hello}
-      Enqueuer.pop(:foo)
+      Queue.pop()
       #=> {:ok, :world}
 
-  We start our enqueuer by calling `start_link\1`. This call is then
+  We start our enqueuer by calling `start_link/1`. This call is then
   forwarded to our adapter. In this case, we dont specify an adapter
   anywhere, so it defaults to the simple FIFO queue implemented with
   the included `GenQueue.SimpleAdapter`.
@@ -46,7 +46,36 @@ defmodule GenQueue do
   ## use GenQueue and adapters
 
   As we can see from above - implementing a simple queue is easy. But
-  we can further extend our queues with more advanced adapters.
+  we can further extend our queues by creating our own adapters or by using
+  external libraries. Simply specify the adapter name in your config.
+
+      config :my_app, MyApp.Enqueuer, [
+        adapter: GenQueue.MyAdapter
+      ]
+
+      defmodule MyApp.Enqueuer do
+        use GenQueue, otp_app: :my_app
+      end
+
+  We can then create our own adapter by creating an adapter module that handles
+  the callbacks specified by `GenQueue.Adapter`.
+
+      defmodule MyApp.MyAdapter do
+        use GenQueue.Adapter
+
+        def handle_push(gen_queue, item) do
+          IO.inspect(item)
+          {:ok, item}
+        end
+      end
+
+  ## Job queues
+
+  One of the benefits of using `GenQueue` is that it can abstract common tasks
+  - like job enqueueing. We can then provide a common API for the various forms
+  of job enqueing we would like to implement, as well as easily swap
+  implementations.
+
 
   """
   @callback start_link(opts :: Keyword.t()) ::
@@ -54,23 +83,21 @@ defmodule GenQueue do
               | {:error, {:already_started, pid}}
               | {:error, term}
 
-  @callback push(queue, any) :: {:ok, any} | {:error, any}
+  @callback push(any, list) :: {:ok, any} | {:error, any}
 
-  @callback push!(queue, any) :: any | no_return
+  @callback push!(any, list) :: any | no_return
 
-  @callback pop(queue) :: {:ok, any} | {:error, any}
+  @callback pop(list) :: {:ok, any} | {:error, any}
 
-  @callback pop!(queue) :: any | no_return
+  @callback pop!(list) :: any | no_return
 
-  @callback flush(queue) :: {:ok, integer} | {:error, any}
+  @callback flush(list) :: {:ok, integer} | {:error, any}
 
-  @callback length(queue) :: {:ok, integer} | {:error, any}
+  @callback length(list) :: {:ok, integer} | {:error, any}
 
   @callback adapter :: module
 
   @type t :: module
-
-  @type queue :: binary | atom
 
   @default_adapter GenQueue.SimpleAdapter
 
@@ -84,34 +111,34 @@ defmodule GenQueue do
         apply(@adapter, :start_link, [__MODULE__, opts])
       end
 
-      def push(queue, item) do
-        GenQueue.push(__MODULE__, queue, item)
+      def push(item, opts \\ []) do
+        GenQueue.push(__MODULE__, item, opts)
       end
 
-      def push!(queue, item) do
-        case push(queue, item) do
+      def push!(item, opts \\ []) do
+        case push(item, opts) do
           {:ok, item} -> item
-          _ -> raise GenQueue.Error, "Failed to push job."
+          _ -> raise GenQueue.Error, "Failed to push item."
         end
       end
 
-      def pop(queue) do
-        GenQueue.pop(__MODULE__, queue)
+      def pop(opts \\ []) do
+        GenQueue.pop(__MODULE__, opts)
       end
 
-      def pop!(queue) do
-        case pop(queue) do
-          {:ok, job} -> job
-          _ -> raise GenQueue.Error, "Failed to pop job."
+      def pop!(opts \\ []) do
+        case pop(opts) do
+          {:ok, item} -> item
+          _ -> raise GenQueue.Error, "Failed to pop item."
         end
       end
 
-      def flush(queue) do
-        GenQueue.flush(__MODULE__, queue)
+      def flush(opts \\ []) do
+        GenQueue.flush(__MODULE__, opts)
       end
 
-      def length(queue) do
-        GenQueue.length(__MODULE__, queue)
+      def length(opts \\ []) do
+        GenQueue.length(__MODULE__, opts)
       end
 
       def adapter do
@@ -120,26 +147,78 @@ defmodule GenQueue do
     end
   end
 
-  @spec push(GenQueue.t(), queue, any) :: {:ok, any} | {:error, any}
-  def push(gen_queue, queue, item) do
-    apply(gen_queue.adapter(), :handle_push, [gen_queue, queue, item])
+  @doc """
+  Push an item to a queue
+
+  ## Parameters:
+    * `gen_queue` - GenQueue module to use
+    * `item` - Any valid term
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, item}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
+  @spec push(GenQueue.t(), any, list) :: {:ok, any} | {:error, any}
+  def push(gen_queue, item, opts \\ []) do
+    apply(gen_queue.adapter(), :handle_push, [gen_queue, item, opts])
   end
 
-  @spec pop(GenQueue.t(), queue) :: {:ok, any} | {:error, any}
-  def pop(gen_queue, queue) do
-    apply(gen_queue.adapter(), :handle_pop, [gen_queue, queue])
+  @doc """
+  Pop an item from a queue
+
+  Parameters:
+    * `gen_queue` - GenQueue module to use
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, item}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
+  @spec pop(GenQueue.t(), list) :: {:ok, any} | {:error, any}
+  def pop(gen_queue, opts \\ []) do
+    apply(gen_queue.adapter(), :handle_pop, [gen_queue, opts])
   end
 
-  @spec flush(GenQueue.t(), queue) :: {:ok, integer} | {:error, any}
-  def flush(gen_queue, queue) do
-    apply(gen_queue.adapter(), :handle_flush, [gen_queue, queue])
+  @doc """
+  Remove all items from a queue
+
+  Parameters:
+    * `gen_queue` - GenQueue module to use
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, number_of_items_removed}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
+  @spec flush(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
+  def flush(gen_queue, opts \\ []) do
+    apply(gen_queue.adapter(), :handle_flush, [gen_queue, opts])
   end
 
-  @spec length(GenQueue.t(), queue) :: {:ok, integer} | {:error, any}
-  def length(gen_queue, queue) do
-    apply(gen_queue.adapter(), :handle_length, [gen_queue, queue])
+  @doc """
+  Get the number of items in a queue
+
+  Parameters:
+    * `gen_queue` - GenQueue module to use
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, number_of_items}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
+  @spec length(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
+  def length(gen_queue, opts \\ []) do
+    apply(gen_queue.adapter(), :handle_length, [gen_queue, opts])
   end
 
+  @doc """
+  Get the adapter for a GenQueue module based on the options provided. If
+  no adapter if specified, the default `GenQueue.SimpleAdapter` is returned.
+
+  Parameters:
+    * `gen_queue` - GenQueue module to use
+  """
   @spec config_adapter(GenQueue.t(), list) :: GenQueue.Adapter.t()
   def config_adapter(gen_queue, opts \\ []) do
     opts

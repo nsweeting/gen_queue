@@ -56,19 +56,23 @@ defmodule GenQueue.SimpleAdapter do
     {:reply, {:ok, queue_size}, queues}
   end
 
-  def handle_push(gen_queue, queue, item) do
-    GenServer.call(gen_queue, {:push, queue, item})
+  def handle_push(gen_queue, item, opts) do
+    GenServer.call(gen_queue, {:push, queue_from_opts(opts), item})
   end
 
-  def handle_pop(gen_queue, queue) do
-    GenServer.call(gen_queue, {:pop, queue})
+  def handle_pop(gen_queue, opts) do
+    GenServer.call(gen_queue, {:pop, queue_from_opts(opts)})
   end
 
-  def handle_flush(gen_queue, queue) do
-    GenServer.call(gen_queue, {:flush, queue})
+  def handle_flush(gen_queue, opts) do
+    GenServer.call(gen_queue, {:flush, queue_from_opts(opts)})
   end
 
-  def handle_length(gen_queue, queue) do
-    GenServer.call(gen_queue, {:length, queue})
+  def handle_length(gen_queue, opts) do
+    GenServer.call(gen_queue, {:length, queue_from_opts(opts)})
+  end
+
+  defp queue_from_opts(opts) do
+    Keyword.get(opts, :queue, "default")
   end
 end
