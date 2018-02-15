@@ -8,8 +8,8 @@ defmodule GenQueue.Test do
   end
 
   def setup_global_test_queue(gen_queue, process_name) when is_atom(process_name) do
-    set_queue_receiver(gen_queue, process_name)
     Process.register(self(), process_name)
+    set_queue_receiver(gen_queue, process_name)
   end
 
   def send_item(gen_queue, item) do
