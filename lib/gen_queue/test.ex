@@ -1,13 +1,13 @@
 defmodule GenQueue.Test do
-  def setup_queue(gen_queue) do
+  def setup_test_queue(gen_queue) do
     set_queue_receiver(gen_queue, :self)
   end
 
-  def reset_queue(gen_queue) do
+  def reset_test_queue(gen_queue) do
     set_queue_receiver(gen_queue, nil)
   end
 
-  def setup_global_queue(gen_queue, process_name) when is_atom(process_name) do
+  def setup_global_test_queue(gen_queue, process_name) when is_atom(process_name) do
     set_queue_receiver(gen_queue, process_name)
     Process.register(self(), process_name)
   end
