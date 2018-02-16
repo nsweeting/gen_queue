@@ -157,14 +157,27 @@ defmodule GenQueue do
 
       @adapter GenQueue.config_adapter(__MODULE__, opts)
 
+      @doc false
+      def child_spec(arg) do
+        %{
+          id: __MODULE__,
+          start: {__MODULE__, :start_link, [arg]}
+        }
+      end
+
+      defoverridable [child_spec: 1]
+
+      @doc false
       def start_link(opts \\ []) do
         apply(@adapter, :start_link, [__MODULE__, opts])
       end
 
+      @doc false
       def push(item, opts \\ []) do
         apply(@adapter, :handle_push, [__MODULE__, item, opts])
       end
 
+      @doc false
       def push!(item, opts \\ []) do
         case push(item, opts) do
           {:ok, item} -> item
@@ -172,10 +185,12 @@ defmodule GenQueue do
         end
       end
 
+      @doc false
       def pop(opts \\ []) do
         apply(@adapter, :handle_pop, [__MODULE__, opts])
       end
 
+      @doc false
       def pop!(opts \\ []) do
         case pop(opts) do
           {:ok, item} -> item
@@ -183,14 +198,17 @@ defmodule GenQueue do
         end
       end
 
+      @doc false
       def flush(opts \\ []) do
         apply(@adapter, :handle_flush, [__MODULE__, opts])
       end
 
+      @doc false
       def length(opts \\ []) do
         apply(@adapter, :handle_length, [__MODULE__, opts])
       end
 
+      @doc false
       def adapter do
         @adapter
       end
