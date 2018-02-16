@@ -16,7 +16,7 @@ The package can be installed by adding `gen_queue` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:gen_queue, "~> 0.1.0"}
+    {:gen_queue, "~> 0.1.4"}
   ]
 end
 ```
