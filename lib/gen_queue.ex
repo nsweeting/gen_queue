@@ -72,7 +72,7 @@ defmodule GenQueue do
   ## Job queues
 
   One of the benefits of using `GenQueue` is that it can abstract common tasks
-  - like job enqueueing. We can then provide a common API for the various forms
+  like job enqueueing. We can then provide a common API for the various forms
   of job enqueing we would like to implement, as well as easily swap
   implementations.
 
@@ -83,18 +83,68 @@ defmodule GenQueue do
               | {:error, {:already_started, pid}}
               | {:error, term}
 
+  @doc """
+  Invoked to push an item to a queue
+
+  ## Parameters:
+    * `item` - Any valid term
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, item}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
   @callback push(any, list) :: {:ok, any} | {:error, any}
 
+  @doc """
+  Same as `push/2` but returns the item or raises if an error occurs.
+  """
   @callback push!(any, list) :: any | no_return
 
+  @doc """
+  Invoked to pop an item from a queue
+
+  Parameters:
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, item}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
   @callback pop(list) :: {:ok, any} | {:error, any}
 
+  @doc """
+  Same as `pop/1` but returns the item or raises if an error occurs.
+  """
   @callback pop!(list) :: any | no_return
 
+  @doc """
+  Invoked to remove all items from a queue
+
+  Parameters:
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, number_of_items_removed}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
   @callback flush(list) :: {:ok, integer} | {:error, any}
 
+  @doc """
+  Invoked to get the number of items in a queue
+
+  Parameters:
+    * `opts` - Any options that may be valid to an adapter
+
+  ## Returns:
+    * `{:ok, number_of_items}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
   @callback length(list) :: {:ok, integer} | {:error, any}
 
+  @doc """
+  Invoked to return the adapter for a queue
+  """
   @callback adapter :: module
 
   @type t :: module
@@ -112,7 +162,7 @@ defmodule GenQueue do
       end
 
       def push(item, opts \\ []) do
-        GenQueue.push(__MODULE__, item, opts)
+        apply(@adapter, :handle_push, [__MODULE__, item, opts])
       end
 
       def push!(item, opts \\ []) do
@@ -123,7 +173,7 @@ defmodule GenQueue do
       end
 
       def pop(opts \\ []) do
-        GenQueue.pop(__MODULE__, opts)
+        apply(@adapter, :handle_pop, [__MODULE__, opts])
       end
 
       def pop!(opts \\ []) do
@@ -134,82 +184,17 @@ defmodule GenQueue do
       end
 
       def flush(opts \\ []) do
-        GenQueue.flush(__MODULE__, opts)
+        apply(@adapter, :handle_flush, [__MODULE__, opts])
       end
 
       def length(opts \\ []) do
-        GenQueue.length(__MODULE__, opts)
+        apply(@adapter, :handle_length, [__MODULE__, opts])
       end
 
       def adapter do
         @adapter
       end
     end
-  end
-
-  @doc """
-  Push an item to a queue
-
-  ## Parameters:
-    * `gen_queue` - GenQueue module to use
-    * `item` - Any valid term
-    * `opts` - Any options that may be valid to an adapter
-
-  ## Returns:
-    * `{:ok, item}` if the operation was successful
-    * `{:error, reason}` if there was an error
-  """
-  @spec push(GenQueue.t(), any, list) :: {:ok, any} | {:error, any}
-  def push(gen_queue, item, opts \\ []) do
-    apply(gen_queue.adapter(), :handle_push, [gen_queue, item, opts])
-  end
-
-  @doc """
-  Pop an item from a queue
-
-  Parameters:
-    * `gen_queue` - GenQueue module to use
-    * `opts` - Any options that may be valid to an adapter
-
-  ## Returns:
-    * `{:ok, item}` if the operation was successful
-    * `{:error, reason}` if there was an error
-  """
-  @spec pop(GenQueue.t(), list) :: {:ok, any} | {:error, any}
-  def pop(gen_queue, opts \\ []) do
-    apply(gen_queue.adapter(), :handle_pop, [gen_queue, opts])
-  end
-
-  @doc """
-  Remove all items from a queue
-
-  Parameters:
-    * `gen_queue` - GenQueue module to use
-    * `opts` - Any options that may be valid to an adapter
-
-  ## Returns:
-    * `{:ok, number_of_items_removed}` if the operation was successful
-    * `{:error, reason}` if there was an error
-  """
-  @spec flush(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
-  def flush(gen_queue, opts \\ []) do
-    apply(gen_queue.adapter(), :handle_flush, [gen_queue, opts])
-  end
-
-  @doc """
-  Get the number of items in a queue
-
-  Parameters:
-    * `gen_queue` - GenQueue module to use
-    * `opts` - Any options that may be valid to an adapter
-
-  ## Returns:
-    * `{:ok, number_of_items}` if the operation was successful
-    * `{:error, reason}` if there was an error
-  """
-  @spec length(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
-  def length(gen_queue, opts \\ []) do
-    apply(gen_queue.adapter(), :handle_length, [gen_queue, opts])
   end
 
   @doc """
