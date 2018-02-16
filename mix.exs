@@ -25,7 +25,7 @@ defmodule GenQueue.Mixfile do
 
   defp description do
     """
-    Job queue wrapper with adapter support for Elixir
+    Queue specification with adapter support for Elixir
     """
   end
 
