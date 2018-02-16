@@ -1,7 +1,7 @@
 defmodule GenQueue.Mixfile do
   use Mix.Project
 
-  @version "0.1.3"
+  @version "0.1.4"
 
   def project do
     [
@@ -40,6 +40,8 @@ defmodule GenQueue.Mixfile do
 
   defp docs do
     [
+      extras: ["README.md"],
+      main: "readme",
       source_url: "https://github.com/nsweeting/gen_queue"
     ]
   end

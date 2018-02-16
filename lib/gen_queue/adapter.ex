@@ -1,4 +1,13 @@
 defmodule GenQueue.Adapter do
+  @moduledoc """
+  A behaviour module for implementing queue adapters.
+  """
+
+  @callback start_link(GenQueue.t(), opts :: Keyword.t()) ::
+              {:ok, pid}
+              | {:error, {:already_started, pid}}
+              | {:error, term}
+
   @doc """
   Push an item to a GenQueue queue
 
@@ -57,6 +66,10 @@ defmodule GenQueue.Adapter do
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour GenQueue.Adapter
+
+      def start_link(_gen_queue, _opts) do
+        {:error, :not_implemented}
+      end
 
       def handle_push(_gen_queue, _item, _opts) do
         {:error, :not_implemented}

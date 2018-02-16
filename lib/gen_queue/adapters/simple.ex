@@ -1,4 +1,8 @@
 defmodule GenQueue.Adapters.Simple do
+  @moduledoc """
+  A simple FIFO queue implementation.
+  """
+
   use GenQueue.Adapter
 
   def start_link(gen_queue, _opts) do

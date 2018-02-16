@@ -69,6 +69,15 @@ defmodule GenQueue do
         end
       end
 
+  ## Current adapters
+
+  Currently, the following adapters are available:
+
+  * [GenQueue Exq](https://github.com/nsweeting/gen_queue_exq) - Redis-backed job queue.
+  * [GenQueue TaskBunny](https://github.com/nsweeting/gen_queue_task_bunny) - RabbitMQ-backed job queue.
+  * [GenQueue Verk](https://github.com/nsweeting/gen_queue_verk) - Redis-backed job queue.
+  * [GenQueue OPQ](https://github.com/nsweeting/gen_queue_opq) - GenStage-backed job queue.
+
   ## Job queues
 
   One of the benefits of using `GenQueue` is that it can abstract common tasks
@@ -76,8 +85,9 @@ defmodule GenQueue do
   of job enqueing we would like to implement, as well as easily swap
   implementations.
 
-
+  Please refer to the documentation for each adapter for more details.
   """
+
   @callback start_link(opts :: Keyword.t()) ::
               {:ok, pid}
               | {:error, {:already_started, pid}}
@@ -157,7 +167,6 @@ defmodule GenQueue do
 
       @adapter GenQueue.config_adapter(__MODULE__, opts)
 
-      @doc false
       def child_spec(arg) do
         %{
           id: __MODULE__,
@@ -167,17 +176,14 @@ defmodule GenQueue do
 
       defoverridable [child_spec: 1]
 
-      @doc false
       def start_link(opts \\ []) do
         apply(@adapter, :start_link, [__MODULE__, opts])
       end
 
-      @doc false
       def push(item, opts \\ []) do
         apply(@adapter, :handle_push, [__MODULE__, item, opts])
       end
 
-      @doc false
       def push!(item, opts \\ []) do
         case push(item, opts) do
           {:ok, item} -> item
@@ -185,12 +191,10 @@ defmodule GenQueue do
         end
       end
 
-      @doc false
       def pop(opts \\ []) do
         apply(@adapter, :handle_pop, [__MODULE__, opts])
       end
 
-      @doc false
       def pop!(opts \\ []) do
         case pop(opts) do
           {:ok, item} -> item
@@ -198,17 +202,14 @@ defmodule GenQueue do
         end
       end
 
-      @doc false
       def flush(opts \\ []) do
         apply(@adapter, :handle_flush, [__MODULE__, opts])
       end
 
-      @doc false
       def length(opts \\ []) do
         apply(@adapter, :handle_length, [__MODULE__, opts])
       end
 
-      @doc false
       def adapter do
         @adapter
       end
