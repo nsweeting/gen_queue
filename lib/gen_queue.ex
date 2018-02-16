@@ -38,7 +38,7 @@ defmodule GenQueue do
   We start our enqueuer by calling `start_link/1`. This call is then
   forwarded to our adapter. In this case, we dont specify an adapter
   anywhere, so it defaults to the simple FIFO queue implemented with
-  the included `GenQueue.SimpleAdapter`.
+  the included `GenQueue.Adapters.Simple`.
 
   We can then add items into our simple FIFO queues with `push/2`, as
   well as remove them with `pop/1`.
@@ -149,7 +149,7 @@ defmodule GenQueue do
 
   @type t :: module
 
-  @default_adapter GenQueue.SimpleAdapter
+  @default_adapter GenQueue.Adapters.Simple
 
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
@@ -199,7 +199,7 @@ defmodule GenQueue do
 
   @doc """
   Get the adapter for a GenQueue module based on the options provided. If
-  no adapter if specified, the default `GenQueue.SimpleAdapter` is returned.
+  no adapter if specified, the default `GenQueue.Adapters.Simple` is returned.
 
   Parameters:
     * `gen_queue` - GenQueue module to use

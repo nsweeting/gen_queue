@@ -1,4 +1,4 @@
-defmodule GenQueue.SimpleAdapterTest do
+defmodule GenQueue.Adapters.SimpleTest do
   use ExUnit.Case, async: true
 
   defmodule Queue do

@@ -1,4 +1,4 @@
-defmodule GenQueue.SimpleAdapter do
+defmodule GenQueue.Adapters.Simple do
   use GenQueue.Adapter
 
   def start_link(gen_queue, _opts) do
