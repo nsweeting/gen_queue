@@ -1,4 +1,6 @@
 # GenQueue
+[![Build Status](https://travis-ci.org/nsweeting/gen_queue.svg?branch=master)](https://travis-ci.org/nsweeting/gen_queue)
+[![GenQueue Exq Version](https://img.shields.io/hexpm/v/gen_queue.svg)](https://hex.pm/packages/gen_queue)
 
 GenQueue is a specification for queues.
 
