@@ -12,7 +12,7 @@ This project currently provides the following functionality:
 
   * `GenQueue.JobAdapter` ([docs](https://hexdocs.pm/gen_queue/GenQueue.JobAdapter.html)) - a behaviour for implementing job-based adapters for a `GenQueue`
 
-  * `GenQueue.Job` ([docs](https://hexdocs.pm/gen_queue/GenQueue.Job.html)) - a struct for containing job-enqueing instructions
+  * `GenQueue.Job` ([docs](https://hexdocs.pm/gen_queue/GenQueue.Job.html)) - a struct for containing job-enqueuing instructions
 
 
 ## Installation
