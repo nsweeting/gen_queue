@@ -10,6 +10,10 @@ This project currently provides the following functionality:
 
   * `GenQueue.Adapter` ([docs](https://hexdocs.pm/gen_queue/GenQueue.Adapter.html)) - a behaviour for implementing adapters for a `GenQueue`
 
+  * `GenQueue.JobAdapter` ([docs](https://hexdocs.pm/gen_queue/GenQueue.JobAdapter.html)) - a behaviour for implementing job-based adapters for a `GenQueue`
+
+  * `GenQueue.Job` ([docs](https://hexdocs.pm/gen_queue/GenQueue.Job.html)) - a struct for containing job-enqueing instructions
+
 
 ## Installation
 
@@ -18,7 +22,7 @@ The package can be installed by adding `gen_queue` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:gen_queue, "~> 0.1.4"}
+    {:gen_queue, "~> 0.1.5"}
   ]
 end
 ```
