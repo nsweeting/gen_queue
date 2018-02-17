@@ -3,7 +3,7 @@ defmodule GenQueue.Adapters.SimpleTest do
 
   defmodule Queue do
     use GenQueue
-  end  
+  end
 
   setup do
     Queue.start_link()
@@ -21,7 +21,7 @@ defmodule GenQueue.Adapters.SimpleTest do
     end
 
     test "stores an item under a given queue" do
-      Queue.push("foo", [queue: :bar])
+      Queue.push("foo", queue: :bar)
       assert {:ok, "foo"} = Queue.pop(queue: :bar)
     end
   end
@@ -35,8 +35,8 @@ defmodule GenQueue.Adapters.SimpleTest do
     end
 
     test "returns items in the order they were pushed for provided queues" do
-      Queue.push("foo", [queue: :baz])
-      Queue.push("bar", [queue: :baz])
+      Queue.push("foo", queue: :baz)
+      Queue.push("bar", queue: :baz)
       assert {:ok, "foo"} = Queue.pop(queue: :baz)
       assert {:ok, "bar"} = Queue.pop(queue: :baz)
     end
@@ -51,8 +51,8 @@ defmodule GenQueue.Adapters.SimpleTest do
     end
 
     test "removes all jobs from the provided queue" do
-      Queue.push("foo", [queue: :baz])
-      Queue.push("bar", [queue: :baz])
+      Queue.push("foo", queue: :baz)
+      Queue.push("bar", queue: :baz)
       assert {:ok, _} = Queue.flush(queue: :baz)
       assert {:ok, nil} = Queue.pop(queue: :baz)
     end
@@ -65,8 +65,8 @@ defmodule GenQueue.Adapters.SimpleTest do
     end
 
     test "returns the number of jobs removed from a provided queue" do
-      Queue.push("foo", [queue: :baz])
-      Queue.push("bar", [queue: :baz])
+      Queue.push("foo", queue: :baz)
+      Queue.push("bar", queue: :baz)
       assert {:ok, 2} = Queue.flush(queue: :baz)
       assert {:ok, 0} = Queue.flush(queue: :baz)
     end

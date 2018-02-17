@@ -1,18 +1,30 @@
 defmodule GenQueue.JobAdapter do
+  @moduledoc """
+  A behaviour module for implementing job queue adapters.
+  """
 
-  @callback handle_job(GenQueue.t(), GenQueue.Job.t()) :: {:ok, GenQueue.Job.t()} | {:error, any}
+  @doc """
+  Push a job to a queue
 
-  alias GenQueue.Job
+  ## Parameters:
+    * `gen_queue` - A `GenQueue` module
+    * `job` - A `GenQueue.Job` struct
+
+  ## Returns:
+    * `{:ok, job}` if the operation was successful
+    * `{:error, reason}` if there was an error
+  """
+  @callback handle_job(gen_queue :: GenQueue.t(), job :: GenQueue.Job.t()) ::
+              {:ok, GenQueue.Job.t()} | {:error, any}
 
   defmacro __using__(_) do
     quote location: :keep do
       @behaviour GenQueue.JobAdapter
-  
+
       use GenQueue.Adapter
 
-      @doc false
       def handle_push(gen_queue, item, opts) do
-        handle_job(gen_queue, Job.new(item, opts))
+        handle_job(gen_queue, GenQueue.Job.new(item, opts))
       end
 
       @doc false
@@ -20,24 +32,7 @@ defmodule GenQueue.JobAdapter do
         {:error, :not_implemented}
       end
 
-      @doc false
-      def handle_pop(_gen_queue, _opts) do
-        {:error, :not_implemented}
-      end
-
-      @doc false
-      def handle_flush(_gen_queue, _opts) do
-        {:error, :not_implemented}
-      end
-
-      @doc false
-      def handle_length(_gen_queue, _opts) do
-        {:error, :not_implemented}
-      end
-
       defoverridable GenQueue.JobAdapter
     end
   end
 end
-
-

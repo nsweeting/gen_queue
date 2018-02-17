@@ -1,4 +1,11 @@
 defmodule GenQueue.Job do
+  @type t :: %__MODULE__{
+          module: module,
+          args: list,
+          queue: binary | atom,
+          delay: integer | DateTime.t()
+        }
+
   defstruct [
     :module,
     :args,

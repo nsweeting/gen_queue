@@ -104,12 +104,12 @@ defmodule GenQueue do
     * `{:ok, item}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback push(any, list) :: {:ok, any} | {:error, any}
+  @callback push(item :: any, opts :: Keyword.t()) :: {:ok, any} | {:error, any}
 
   @doc """
   Same as `push/2` but returns the item or raises if an error occurs.
   """
-  @callback push!(any, list) :: any | no_return
+  @callback push!(item :: any, opts :: Keyword.t()) :: any | no_return
 
   @doc """
   Invoked to pop an item from a queue
@@ -121,12 +121,12 @@ defmodule GenQueue do
     * `{:ok, item}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback pop(list) :: {:ok, any} | {:error, any}
+  @callback pop(opts :: Keyword.t()) :: {:ok, any} | {:error, any}
 
   @doc """
   Same as `pop/1` but returns the item or raises if an error occurs.
   """
-  @callback pop!(list) :: any | no_return
+  @callback pop!(opts :: Keyword.t()) :: any | no_return
 
   @doc """
   Invoked to remove all items from a queue
@@ -138,7 +138,7 @@ defmodule GenQueue do
     * `{:ok, number_of_items_removed}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback flush(list) :: {:ok, integer} | {:error, any}
+  @callback flush(opts :: Keyword.t()) :: {:ok, integer} | {:error, any}
 
   @doc """
   Invoked to get the number of items in a queue
@@ -150,7 +150,7 @@ defmodule GenQueue do
     * `{:ok, number_of_items}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback length(list) :: {:ok, integer} | {:error, any}
+  @callback length(opts :: Keyword.t()) :: {:ok, integer} | {:error, any}
 
   @doc """
   Invoked to return the adapter for a queue
@@ -174,7 +174,7 @@ defmodule GenQueue do
         }
       end
 
-      defoverridable [child_spec: 1]
+      defoverridable child_spec: 1
 
       def start_link(opts \\ []) do
         apply(@adapter, :start_link, [__MODULE__, opts])
@@ -223,7 +223,7 @@ defmodule GenQueue do
   Parameters:
     * `gen_queue` - GenQueue module to use
   """
-  @spec config_adapter(GenQueue.t(), list) :: GenQueue.Adapter.t()
+  @spec config_adapter(GenQueue.t(), opts :: Keyword.t()) :: GenQueue.Adapter.t()
   def config_adapter(gen_queue, opts \\ []) do
     opts
     |> Keyword.get(:otp_app)

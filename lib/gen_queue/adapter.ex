@@ -3,16 +3,16 @@ defmodule GenQueue.Adapter do
   A behaviour module for implementing queue adapters.
   """
 
-  @callback start_link(GenQueue.t(), opts :: Keyword.t()) ::
+  @callback start_link(gen_queue :: GenQueue.t(), opts :: Keyword.t()) ::
               {:ok, pid}
               | {:error, {:already_started, pid}}
               | {:error, term}
 
   @doc """
-  Push an item to a GenQueue queue
+  Push an item to a queue
 
   ## Parameters:
-    * `gen_queue` - Any GenQueue module
+    * `gen_queue` - A `GenQueue` module
     * `item` - Any valid term
     * `opts` - Any adapter options
 
@@ -20,46 +20,50 @@ defmodule GenQueue.Adapter do
     * `{:ok, item}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback handle_push(GenQueue.t(), any, list) :: {:ok, any} | {:error, any}
+  @callback handle_push(gen_queue :: GenQueue.t(), item :: any, opts :: Keyword.t()) ::
+              {:ok, any} | {:error, any}
 
   @doc """
-  Pop an item from a GenQueue queue
+  Pop an item from a queue
 
   Parameters:
-    * `gen_queue` - Any GenQueue module
+    * `gen_queue` - A `GenQueue` module
     * `opts` - Any adapter options
 
   ## Returns:
     * `{:ok, item}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback handle_pop(GenQueue.t(), list) :: {:ok, any} | {:error, any}
+  @callback handle_pop(gen_queue :: GenQueue.t(), opts :: Keyword.t()) ::
+              {:ok, any} | {:error, any}
 
   @doc """
-  Remove all items from a GenQueue queue
+  Remove all items from a queue
 
   Parameters:
-    * `gen_queue` - Any GenQueue module
+    * `gen_queue` - A `GenQueue` module
     * `opts` - Any adapter options
 
   ## Returns:
     * `{:ok, number_of_items_removed}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback handle_flush(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
-  
+  @callback handle_flush(gen_queue :: GenQueue.t(), opts :: Keyword.t()) ::
+              {:ok, integer} | {:error, any}
+
   @doc """
-  Get the number of items in a GenQueue queue
+  Get the number of items in a queue
 
   Parameters:
-    * `gen_queue` - Any GenQueue module
+    * `gen_queue` - A `GenQueue` module
     * `opts` - Any adapter options
 
   ## Returns:
     * `{:ok, number_of_items}` if the operation was successful
     * `{:error, reason}` if there was an error
   """
-  @callback handle_length(GenQueue.t(), list) :: {:ok, integer} | {:error, any}
+  @callback handle_length(gen_queue :: GenQueue.t(), opts :: Keyword.t()) ::
+              {:ok, integer} | {:error, any}
 
   @type t :: module
 
@@ -67,22 +71,27 @@ defmodule GenQueue.Adapter do
     quote location: :keep do
       @behaviour GenQueue.Adapter
 
+      @doc false
       def start_link(_gen_queue, _opts) do
         {:error, :not_implemented}
       end
 
+      @doc false
       def handle_push(_gen_queue, _item, _opts) do
         {:error, :not_implemented}
       end
 
+      @doc false
       def handle_pop(_gen_queue, _opts) do
         {:error, :not_implemented}
       end
 
+      @doc false
       def handle_flush(_gen_queue, _opts) do
         {:error, :not_implemented}
       end
 
+      @doc false
       def handle_length(_gen_queue, _opts) do
         {:error, :not_implemented}
       end

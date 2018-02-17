@@ -8,7 +8,7 @@ defmodule GenQueue.Mixfile do
       app: :gen_queue,
       version: @version,
       elixir: "~> 1.6",
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
       package: package(),
@@ -34,7 +34,7 @@ defmodule GenQueue.Mixfile do
       files: ["lib", "mix.exs", "README*"],
       maintainers: ["Nicholas Sweeting"],
       licenses: ["MIT"],
-      links:  %{"GitHub" => "https://github.com/nsweeting/gen_queue"}
+      links: %{"GitHub" => "https://github.com/nsweeting/gen_queue"}
     ]
   end
 
@@ -49,7 +49,7 @@ defmodule GenQueue.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 end

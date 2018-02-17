@@ -1,7 +1,7 @@
 defmodule GenQueue.Test do
   @moduledoc """
   Conveniences for testing queues.
-  
+
   This module allows us to create or use existing adapter "mock" libraries.
   A mock adapter is an adapter that mirrors the functionality of an exisiting
   adapter, but instead sends the item to the mailbox of a specified process.
