@@ -155,7 +155,7 @@ defmodule GenQueue do
   @doc """
   Invoked to return the adapter for a queue
   """
-  @callback adapter :: module
+  @callback adapter :: GenQueue.Adapter.t()
 
   @type t :: module
 

@@ -1,6 +1,6 @@
 defmodule GenQueue.Adapters.MockJob do
   @moduledoc """
-  A simple 
+  A simple mock job queue implementation.
   """
 
   use GenQueue.JobAdapter
@@ -9,6 +9,21 @@ defmodule GenQueue.Adapters.MockJob do
     :ignore
   end
 
+  @doc """
+  Push a job that will be returned to the current (or globally set) processes
+  mailbox.
+  
+  Please see `GenQueue.Test` for further details.
+
+  ## Parameters:
+    * `gen_queue` - A `GenQueue` module
+    * `job` - A `GenQueue.Job`
+
+  ## Returns:
+    * `{:ok, job}` if the operation was successful
+  """
+  @spec handle_job(gen_queue :: GenQueue.t(), job :: GenQueue.Job.t()) ::
+          {:ok, GenQueue.Job.t()} | {:error, any}
   def handle_job(gen_queue, job) do
     GenQueue.Test.send_item(gen_queue, job)
     {:ok, job}
