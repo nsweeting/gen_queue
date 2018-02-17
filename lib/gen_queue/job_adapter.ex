@@ -24,7 +24,7 @@ defmodule GenQueue.JobAdapter do
       use GenQueue.Adapter
 
       @doc """
-      Callback implementation for GenQueue.Adapter.push/2
+      Callback implementation for `GenQueue.Adapter.push/2`
       """
       def handle_push(gen_queue, item, opts) do
         handle_job(gen_queue, GenQueue.Job.new(item, opts))
