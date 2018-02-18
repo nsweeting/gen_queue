@@ -38,6 +38,8 @@ adapters are supported.
 
   * [GenQueue Exq](https://github.com/nsweeting/gen_queue_exq) - Redis-backed job queue.
   * [GenQueue TaskBunny](https://github.com/nsweeting/gen_queue_task_bunny) - RabbitMQ-backed job queue.
+  * `GenQueue Que` - Mnesia-backed job queue. Currently has an Elixir 1.6 bug. Not available until this is fixed.
+  * [GenQueue Toniq](https://github.com/nsweeting/gen_queue_toniq) - Redis-backed job queue.
   * [GenQueue Verk](https://github.com/nsweeting/gen_queue_verk) - Redis-backed job queue.
   * [GenQueue OPQ](https://github.com/nsweeting/gen_queue_opq) - GenStage-backed job queue.
 
