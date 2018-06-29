@@ -50,11 +50,17 @@ defmodule GenQueue do
   external libraries. Simply specify the adapter name in your config.
 
       config :my_app, MyApp.Enqueuer, [
-        adapter: GenQueue.MyAdapter
+        adapter: MyApp.MyAdapter
       ]
 
       defmodule MyApp.Enqueuer do
         use GenQueue, otp_app: :my_app
+      end
+
+  The custom adapter can also be specified for the module in-line:
+
+      defmodule MyApp.Enqueuer do
+        use GenQueue, adapter: MyApp.MyAdapter
       end
 
   We can then create our own adapter by creating an adapter module that handles
@@ -224,10 +230,15 @@ defmodule GenQueue do
     * `gen_queue` - GenQueue module to use
   """
   @spec config_adapter(GenQueue.t(), opts :: Keyword.t()) :: GenQueue.Adapter.t()
-  def config_adapter(gen_queue, opts \\ []) do
-    opts
-    |> Keyword.get(:otp_app)
+  def config_adapter(gen_queue, opts \\ [])
+
+  def config_adapter(_gen_queue, [adapter: adapter]) when is_atom(adapter), do: adapter
+
+  def config_adapter(gen_queue, [otp_app: app]) when is_atom(app) do
+    app
     |> Application.get_env(gen_queue, [])
     |> Keyword.get(:adapter, @default_adapter)
   end
+
+  def config_adapter(_gen_queue, _opts), do: @default_adapter
 end
