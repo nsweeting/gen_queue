@@ -1,6 +1,6 @@
 # GenQueue
 [![Build Status](https://travis-ci.org/nsweeting/gen_queue.svg?branch=master)](https://travis-ci.org/nsweeting/gen_queue)
-[![GenQueue Exq Version](https://img.shields.io/hexpm/v/gen_queue.svg)](https://hex.pm/packages/gen_queue)
+[![GenQueue Version](https://img.shields.io/hexpm/v/gen_queue.svg)](https://hex.pm/packages/gen_queue)
 
 GenQueue is a specification for queues.
 
@@ -22,7 +22,7 @@ The package can be installed by adding `gen_queue` to your list of dependencies 
 ```elixir
 def deps do
   [
-    {:gen_queue, "~> 0.1.5"}
+    {:gen_queue, "~> 0.1.6"}
   ]
 end
 ```
@@ -44,3 +44,8 @@ adapters are supported.
   * [GenQueue OPQ](https://github.com/nsweeting/gen_queue_opq) - GenStage-backed job queue.
 
 More adapters are always welcome!
+
+## Contributors
+
+ * Nick Sweeting - [@nsweeting](https://github.com/nsweeting)
+ * Austin Ziegler - [@halostatue](https://github.com/halostatue)
