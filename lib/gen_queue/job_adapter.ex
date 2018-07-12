@@ -4,15 +4,7 @@ defmodule GenQueue.JobAdapter do
   """
 
   @doc """
-  Push a job to a queue
-
-  ## Parameters:
-    * `gen_queue` - A `GenQueue` module
-    * `job` - A `GenQueue.Job` struct
-
-  ## Returns:
-    * `{:ok, job}` if the operation was successful
-    * `{:error, reason}` if there was an error
+  Pushes a job to a queue
   """
   @callback handle_job(gen_queue :: GenQueue.t(), job :: GenQueue.Job.t()) ::
               {:ok, GenQueue.Job.t()} | {:error, any}

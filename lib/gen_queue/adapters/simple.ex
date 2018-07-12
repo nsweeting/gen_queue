@@ -1,7 +1,5 @@
 defmodule GenQueue.Adapters.Simple do
-  @moduledoc """
-  A simple FIFO queue implementation.
-  """
+  @moduledoc false
 
   use GenQueue.Adapter
 

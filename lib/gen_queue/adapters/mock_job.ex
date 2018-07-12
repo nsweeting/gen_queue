@@ -12,15 +12,8 @@ defmodule GenQueue.Adapters.MockJob do
   @doc """
   Push a job that will be returned to the current (or globally set) processes
   mailbox.
-  
+
   Please see `GenQueue.Test` for further details.
-
-  ## Parameters:
-    * `gen_queue` - A `GenQueue` module
-    * `job` - A `GenQueue.Job`
-
-  ## Returns:
-    * `{:ok, job}` if the operation was successful
   """
   @spec handle_job(gen_queue :: GenQueue.t(), job :: GenQueue.Job.t()) ::
           {:ok, GenQueue.Job.t()} | {:error, any}

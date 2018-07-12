@@ -3,14 +3,14 @@ defmodule GenQueue do
   A behaviour module for implementing queues.
 
   GenQueue relies on adapters to handle the specifics of how the queues
-  are run. At its most simple, this can mean simple FIFO queues. At its
+  are run. At its most simple, this can mean basic memory FIFO queues. At its
   most advanced, this can mean full async job queues with retries and
   backoffs. By providing a standard interface for such tools - ease in
   switching between different implementations is assured.
 
   ## Example
 
-  The GenQueue behaviour abstracts the common queue interactions. 
+  The GenQueue behaviour abstracts the common queue interactions.
   Developers are only required to implement the callbacks and functionality
   they are interested in via adapters.
 
@@ -19,17 +19,17 @@ defmodule GenQueue do
       defmodule Queue do
         use GenQueue
       end
-      
+
        # Start the queue
       Queue.start_link()
 
-      # Push items into the :foo queue
+      # Push items into the queue
       Queue.push(:hello)
       #=> {:ok, :hello}
       Queue.push(:world)
       #=> {:ok, :world}
-      
-      # Pop items from the :foo queue
+
+      # Pop items from the queue
       Queue.pop()
       #=> {:ok, :hello}
       Queue.pop()
@@ -57,7 +57,7 @@ defmodule GenQueue do
         use GenQueue, otp_app: :my_app
       end
 
-  The custom adapter can also be specified for the module in-line:
+  The adapter can also be specified for the module in line:
 
       defmodule MyApp.Enqueuer do
         use GenQueue, adapter: MyApp.MyAdapter
@@ -94,21 +94,17 @@ defmodule GenQueue do
   Please refer to the documentation for each adapter for more details.
   """
 
-  @callback start_link(opts :: Keyword.t()) ::
-              {:ok, pid}
-              | {:error, {:already_started, pid}}
-              | {:error, term}
+  @callback start_link(opts :: Keyword.t()) :: GenServer.on_start()
 
   @doc """
-  Invoked to push an item to a queue
+  Pushes an item to a queue
 
-  ## Parameters:
-    * `item` - Any valid term
-    * `opts` - Any options that may be valid to an adapter
+  ## Example
 
-  ## Returns:
-    * `{:ok, item}` if the operation was successful
-    * `{:error, reason}` if there was an error
+      case MyQueue.push(value) do
+        {:ok, value} -> # Pushed with success
+        {:error, _}  -> # Something went wrong
+      end
   """
   @callback push(item :: any, opts :: Keyword.t()) :: {:ok, any} | {:error, any}
 
@@ -118,14 +114,14 @@ defmodule GenQueue do
   @callback push!(item :: any, opts :: Keyword.t()) :: any | no_return
 
   @doc """
-  Invoked to pop an item from a queue
+  Pops an item from a queue
 
-  Parameters:
-    * `opts` - Any options that may be valid to an adapter
+  ## Example
 
-  ## Returns:
-    * `{:ok, item}` if the operation was successful
-    * `{:error, reason}` if there was an error
+      case MyQueue.pop() do
+        {:ok, value} -> # Popped with success
+        {:error, _}  -> # Something went wrong
+      end
   """
   @callback pop(opts :: Keyword.t()) :: {:ok, any} | {:error, any}
 
@@ -135,31 +131,36 @@ defmodule GenQueue do
   @callback pop!(opts :: Keyword.t()) :: any | no_return
 
   @doc """
-  Invoked to remove all items from a queue
+  Removes all items from a queue
 
-  Parameters:
-    * `opts` - Any options that may be valid to an adapter
+  ## Example
 
-  ## Returns:
-    * `{:ok, number_of_items_removed}` if the operation was successful
-    * `{:error, reason}` if there was an error
+      case MyQueue.flush() do
+        {:ok, number_of_items} -> # Flushed with success
+        {:error, _}  -> # Something went wrong
+      end
   """
   @callback flush(opts :: Keyword.t()) :: {:ok, integer} | {:error, any}
 
   @doc """
-  Invoked to get the number of items in a queue
+  Gets the number of items in a queue
 
-  Parameters:
-    * `opts` - Any options that may be valid to an adapter
+  ## Example
 
-  ## Returns:
-    * `{:ok, number_of_items}` if the operation was successful
-    * `{:error, reason}` if there was an error
+      case MyQueue.length() do
+        {:ok, number_of_items} -> # Counted with success
+        {:error, _}  -> # Something went wrong
+      end
   """
   @callback length(opts :: Keyword.t()) :: {:ok, integer} | {:error, any}
 
   @doc """
-  Invoked to return the adapter for a queue
+  Returns the application config for a queue
+  """
+  @callback config :: Keyword.t()
+
+  @doc """
+  Returns the adapter for a queue
   """
   @callback adapter :: GenQueue.Adapter.t()
 
@@ -171,7 +172,8 @@ defmodule GenQueue do
     quote bind_quoted: [opts: opts] do
       @behaviour GenQueue
 
-      @adapter GenQueue.config_adapter(__MODULE__, opts)
+      @adapter GenQueue.adapter(__MODULE__, opts)
+      @config GenQueue.config(__MODULE__, opts)
 
       def child_spec(arg) do
         %{
@@ -216,29 +218,84 @@ defmodule GenQueue do
         apply(@adapter, :handle_length, [__MODULE__, opts])
       end
 
+      def config do
+        @config
+      end
+
       def adapter do
         @adapter
       end
     end
   end
 
-  @doc """
-  Get the adapter for a GenQueue module based on the options provided. If
-  no adapter if specified, the default `GenQueue.Adapters.Simple` is returned.
-
-  Parameters:
-    * `gen_queue` - GenQueue module to use
-  """
+  @doc false
+  @deprecated "Use adapter/2 instead"
   @spec config_adapter(GenQueue.t(), opts :: Keyword.t()) :: GenQueue.Adapter.t()
   def config_adapter(gen_queue, opts \\ [])
 
-  def config_adapter(_gen_queue, [adapter: adapter]) when is_atom(adapter), do: adapter
+  def config_adapter(_gen_queue, adapter: adapter) when is_atom(adapter), do: adapter
 
-  def config_adapter(gen_queue, [otp_app: app]) when is_atom(app) do
+  def config_adapter(gen_queue, otp_app: app) when is_atom(app) do
     app
     |> Application.get_env(gen_queue, [])
     |> Keyword.get(:adapter, @default_adapter)
   end
 
   def config_adapter(_gen_queue, _opts), do: @default_adapter
+
+  @doc """
+  Get the adapter for a GenQueue module based on the options provided.
+
+  If no adapter if specified, the default `GenQueue.Adapters.Simple` is returned.
+
+  ## Options:
+
+    * `:adapter` - The adapter to be returned.
+    * `:otp_app` - An OTP application that has your GenQueue adapter configuration.
+
+  ## Example
+
+      GenQueue.adapter(MyQueue, [otp_app: :my_app])
+  """
+  @since "0.1.7"
+  @spec adapter(GenQueue.t(), opts :: Keyword.t()) :: GenQueue.Adapter.t()
+  def adapter(gen_queue, opts \\ [])
+
+  def adapter(_gen_queue, adapter: adapter) when is_atom(adapter), do: adapter
+
+  def adapter(gen_queue, otp_app: app) when is_atom(app) do
+    app
+    |> Application.get_env(gen_queue, [])
+    |> Keyword.get(:adapter, @default_adapter)
+  end
+
+  def adapter(_gen_queue, _opts), do: @default_adapter
+
+  @doc """
+  Get the config for a GenQueue module based on the options provided.
+
+  If an `:otp_app` option is provided, this will return the application config.
+  Otherwise, it will return the options given.
+
+  ## Options
+
+    * `:otp_app` - An OTP application that has your GenQueue configuration.
+
+  ## Example
+
+      # Get the application config
+      GenQueue.config(MyQueue, [otp_app: :my_app])
+
+      # Returns the provided options
+      GenQueue.config(MyQueue, [adapter: MyAdapter])
+  """
+  @since "0.1.7"
+  @spec config(GenQueue.t(), opts :: Keyword.t()) :: GenQueue.Adapter.t()
+  def config(gen_queue, opts \\ [])
+
+  def config(gen_queue, otp_app: app) when is_atom(app) do
+    Application.get_env(app, gen_queue, [])
+  end
+
+  def config(_gen_queue, opts) when is_list(opts), do: opts
 end

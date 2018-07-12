@@ -37,9 +37,6 @@ defmodule GenQueue.Test do
 
   @doc """
   Sets the queue reciever as the current process for a GenQueue.
-
-  Parameters:
-    * `gen_queue` - GenQueue module to use
   """
   @spec setup_test_queue(GenQueue.t()) :: :ok
   def setup_test_queue(gen_queue) do
@@ -48,9 +45,6 @@ defmodule GenQueue.Test do
 
   @doc """
   Removes any current queue receiver for a GenQueue.
-
-  Parameters:
-    * `gen_queue` - GenQueue module to use
   """
   @spec reset_test_queue(GenQueue.t()) :: :ok
   def reset_test_queue(gen_queue) do
@@ -58,13 +52,10 @@ defmodule GenQueue.Test do
   end
 
   @doc """
-  Sets the queue reciever as the current process for a GenQueue. The current
-  process is also given a name. This ensures queues that run outside of the
-  current process are able to send items to the correct mailbox.
+  Sets the queue reciever as the current process for a GenQueue.
 
-  Parameters:
-    * `gen_queue` - GenQueue module to use
-    * `process_name` - A name for the current process.
+  The current process is also given a name. This ensures queues that run outside
+  of the current process are able to send items to the correct mailbox.
   """
   @spec setup_global_test_queue(GenQueue.t(), atom) :: :ok
   def setup_global_test_queue(gen_queue, process_name) when is_atom(process_name) do
@@ -74,10 +65,6 @@ defmodule GenQueue.Test do
 
   @doc """
   Sends an item to the mailbox of a process set for a GenQueue.
-
-  Parameters:
-    * `gen_queue` - GenQueue module to use
-    * `item` - Any valid term.
   """
   @spec send_item(GenQueue.t(), any) :: any
   def send_item(gen_queue, item) do

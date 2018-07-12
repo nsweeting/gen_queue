@@ -3,26 +3,31 @@ defmodule GenQueue.Job do
     :module,
     :args,
     :queue,
-    :delay
+    :delay,
+    :config
   ]
 
   @typedoc "Details on how and what to enqueue a job with"
   @type job :: module | {module} | {module, list} | {module, any}
 
   @typedoc "The name of a queue to place the job under"
-  @type queue :: binary | atom
+  @type queue :: binary | atom | nil
 
   @typedoc "A delay to schedule the job with"
-  @type delay :: integer | DateTime.t()
+  @type delay :: integer | DateTime.t() | nil
+
+  @typedoc "Any additional configuration that is adapter-specific"
+  @type config :: list | nil
 
   @typedoc "Options for enqueuing jobs"
-  @type options :: [{:delay, delay}, {:queue, queue}]
+  @type options :: [{:delay, delay}, {:queue, queue}, {:config, config}]
 
   @type t :: %GenQueue.Job{
           module: module,
           args: list,
           queue: queue,
-          delay: delay
+          delay: delay,
+          config: config
         }
 
   @spec new(job, options) :: GenQueue.Job.t()
@@ -44,13 +49,14 @@ defmodule GenQueue.Job do
 
   @spec new(module, list, options) :: GenQueue.Job.t()
   def new(module, args, opts) when is_list(args) do
-    {queue, delay} = parse_options(opts)
-    %GenQueue.Job{module: module, args: args, queue: queue, delay: delay}
-  end
+    opts = Enum.into(opts, %{})
 
-  defp parse_options(opts) do
-    queue = Keyword.get(opts, :queue)
-    delay = Keyword.get(opts, :delay)
-    {queue, delay}
+    %GenQueue.Job{
+      module: module,
+      args: args,
+      queue: opts.queue,
+      delay: opts.delay,
+      config: opts.config
+    }
   end
 end
