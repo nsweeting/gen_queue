@@ -31,6 +31,8 @@ defmodule GenQueue.Job do
         }
 
   @spec new(job, options) :: GenQueue.Job.t()
+  def new(module, opts \\ [])
+
   def new(module, opts) when is_atom(module) do
     new(module, [], opts)
   end
@@ -49,14 +51,7 @@ defmodule GenQueue.Job do
 
   @spec new(module, list, options) :: GenQueue.Job.t()
   def new(module, args, opts) when is_list(args) do
-    opts = Enum.into(opts, %{})
-
-    %GenQueue.Job{
-      module: module,
-      args: args,
-      queue: opts.queue,
-      delay: opts.delay,
-      config: opts.config
-    }
+    job = Keyword.merge(opts, [module: module, args: args])
+    struct(__MODULE__, job)
   end
 end
