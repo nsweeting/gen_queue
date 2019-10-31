@@ -42,6 +42,7 @@ adapters are supported.
   * [GenQueue Toniq](https://github.com/nsweeting/gen_queue_toniq) - Redis-backed job queue.
   * [GenQueue Verk](https://github.com/nsweeting/gen_queue_verk) - Redis-backed job queue.
   * [GenQueue OPQ](https://github.com/nsweeting/gen_queue_opq) - GenStage-backed job queue.
+  * [GenQueue Oban](https://github.com/Trax-retail/gen_queue_oban) - Postgres-backed job queue.
 
 More adapters are always welcome!
 
@@ -49,3 +50,4 @@ More adapters are always welcome!
 
  * Nick Sweeting - [@nsweeting](https://github.com/nsweeting)
  * Austin Ziegler - [@halostatue](https://github.com/halostatue)
+ * Eduard Llamosí - [@ellamosi](https://github.com/ellamosi)
