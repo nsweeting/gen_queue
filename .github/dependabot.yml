@@ -1,0 +1,55 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions-minor:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: npm
+    directory: /ts
+    schedule:
+      interval: monthly
+    groups:
+      typescript-development:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      typescript-production:
+        dependency-type: production
+        update-types:
+          - patch
+
+  - package-ecosystem: mix
+    directory: /elixir
+    schedule:
+      interval: monthly
+    groups:
+      elixir-development:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      elixir-production:
+        dependency-type: production
+        update-types:
+          - patch
+
+  - package-ecosystem: bundler
+    directory: /ruby
+    schedule:
+      interval: monthly
+      ruby-development:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      ruby-production:
+        dependency-type: production
+        update-types:
+          - patch

@@ -257,7 +257,7 @@ defmodule GenQueue do
 
       GenQueue.adapter(MyQueue, [otp_app: :my_app])
   """
-  @since "0.1.7"
+  @doc since: "0.1.7"
   @spec adapter(GenQueue.t(), opts :: Keyword.t()) :: GenQueue.Adapter.t()
   def adapter(gen_queue, opts \\ [])
 
@@ -289,7 +289,7 @@ defmodule GenQueue do
       # Returns the provided options
       GenQueue.config(MyQueue, [adapter: MyAdapter])
   """
-  @since "0.1.7"
+  @doc since: "0.1.7"
   @spec config(GenQueue.t(), opts :: Keyword.t()) :: GenQueue.Adapter.t()
   def config(gen_queue, opts \\ [])
 

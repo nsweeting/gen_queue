@@ -1,0 +1,76 @@
+name: Elixir CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  elixir-ci:
+    name: Elixir ${{ matrix.elixir }} (OTP ${{ matrix.otp }})
+
+    env:
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_US.UTF-8
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - elixir: '1.15'
+            otp: '26'
+            os: ubuntu-22.04
+            check_formatted: true
+            warnings_as_errors: true
+          - elixir: '1.16'
+            otp: '26'
+            os: ubuntu-22.04
+          - elixir: '1.17'
+            otp: '27'
+            os: ubuntu-22.04
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-elixir@v1
+        id: install
+        with:
+          otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
+
+      - uses: actions/cache@v4
+        with:
+          key: builds@elixir-${{ steps.install.outputs.elixir-version }}-otp-${{ steps.install.outputs.otp-version }}-mix-${{ hashFiles('mix.lock') }}
+          path: |
+            elixir/deps
+            elxir/_build
+
+      - run: mix 'do' deps.get, deps.compile
+        working-directory: ./elixir
+
+      - run: mix format --check-formatted
+        working-directory: ./elixir
+        if: matrix.check_formatted
+
+      - run: mix compile --warnings-as-errors
+        working-directory: ./elixir
+        if: matrix.warnings_as_errors
+
+      - run: mix compile
+        working-directory: ./elixir
+        if: ${{ !matrix.warnings_as_errors }}
+
+      - run: mix test
+        working-directory: ./elixir
+
+      - uses: actions/cache@v4
+        with:
+          key: plts@elixir-${{ steps.install.outputs.elixir-version }}-otp-${{ steps.install.outputs.otp-version }}-mix-${{ hashFiles('mix.lock') }}
+          path: |
+            elixir/priv/plts
+          restore-keys: |
+            plts@elixir-${{ steps.install.outputs.elixir-version }}-otp-${{ steps.install.outputs.otp-version }}-mix-

@@ -14,4 +14,3 @@ defmodule GenQueue.JobTest do
     end
   end
 end
-

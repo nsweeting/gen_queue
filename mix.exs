@@ -7,7 +7,7 @@ defmodule GenQueue.Mixfile do
     [
       app: :gen_queue,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: description(),
